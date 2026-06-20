@@ -219,7 +219,8 @@ jobs:
             build/aria2-src
 
           cd build/aria2-src
-          sed -i 's/AM_CONDITIONAL(\[HAVE_GAI_STRERROR\], false)/AM_CONDITIONAL([HAVE_GAI_STRERROR], true)/g' configure.ac
+          sed -i 's/const char\* gai_strerror(ecode)/const char* gai_strerror(int ecode)/g' src/gai_strerror.c
+          sed -i '/int ecode;/d' src/gai_strerror.c
           git rev-parse --verify HEAD
           autoreconf -i
 
