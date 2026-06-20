@@ -219,6 +219,7 @@ jobs:
             build/aria2-src
 
           cd build/aria2-src
+          sed -i 's/AM_CONDITIONAL(\[HAVE_GAI_STRERROR\], false)/AM_CONDITIONAL([HAVE_GAI_STRERROR], true)/g' configure.ac
           git rev-parse --verify HEAD
           autoreconf -i
 
