@@ -77,13 +77,26 @@ jobs:
             ca-certificates \
             gettext \
             git \
-            libc-ares-dev \
             libexpat1-dev \
             libsqlite3-dev \
             libssl-dev \
             libtool \
             pkg-config \
             zlib1g-dev
+
+      - name: Build static c-ares from source (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          set -euxo pipefail
+          CARES_VERSION="1.30.0"
+          curl -LO "https://github.com/c-ares/c-ares/releases/download/v${CARES_VERSION}/c-ares-${CARES_VERSION}.tar.gz"
+          tar -zxf "c-ares-${CARES_VERSION}.tar.gz"
+          cd "c-ares-${CARES_VERSION}"
+          ./configure --enable-static --disable-shared --prefix=/usr/local
+          make -j"$(nproc)"
+          sudo make install
+          cd ..
+          rm -rf "c-ares-${CARES_VERSION}" "c-ares-${CARES_VERSION}.tar.gz"
 
       - name: Install macOS build dependencies
         if: matrix.platform == 'macos'
@@ -136,6 +149,9 @@ jobs:
           )
 
           if [[ "${{ matrix.platform }}" == "linux" ]]; then
+            export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+            export CPPFLAGS="-I/usr/local/include"
+            export LDFLAGS="-L/usr/local/lib"
             configure_args+=(
               ARIA2_STATIC=yes
               --with-openssl
@@ -220,6 +236,7 @@ jobs:
             --without-libnettle
             --without-libgcrypt
             --disable-nls
+            ac_cv_func_gai_strerror=yes
           )
 
           ./configure "${configure_args[@]}"
