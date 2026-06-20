@@ -236,6 +236,7 @@ jobs:
             --without-libnettle
             --without-libgcrypt
             --disable-nls
+            ac_cv_func_getaddrinfo=yes
             ac_cv_func_gai_strerror=yes
           )
 
